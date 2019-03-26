@@ -163,7 +163,7 @@ def getFullPath(path, url, useKiosk, userAgent):
 
     kiosk = ""
     if useKiosk=="yes":
-        kiosk = '--kiosk'
+        kiosk = '--kiosk --fullscreen'
     if userAgent:
         userAgent = '--user-agent="'+userAgent+'"'
     
