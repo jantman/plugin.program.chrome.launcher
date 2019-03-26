@@ -163,12 +163,12 @@ def getFullPath(path, url, useKiosk, userAgent):
 
     kiosk = ""
     if useKiosk=="yes":
-        kiosk = '--kiosk --start-fullscreen'
+        kiosk = '--kiosk'
     if userAgent:
         userAgent = '--user-agent="'+userAgent+'"'
     
     #fullPath = '"'+path+'" '+profile+userAgent+'--start-maximized --disable-translate --disable-new-tab-first-run --no-default-browser-check --no-first-run '+kiosk+'"'+black_background+'"'
-    fullPath = [path, profile, userAgent, '--start-maximized','--disable-translate','--disable-new-tab-first-run','--no-default-browser-check','--no-first-run', kiosk, black_background]
+    fullPath = [path, profile, userAgent, '--start-fullscreen','--disable-translate','--disable-new-tab-first-run','--no-default-browser-check','--no-first-run', kiosk, black_background]
     for idx in range(0,len(fullPath))[::-1]:
         if not fullPath[idx]:
             del fullPath[idx]
