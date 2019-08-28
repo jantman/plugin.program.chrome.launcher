@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Prevent loading two or more tabs due to LIRC still being enabled in XBMC / KODI
-CHROME_STARTED=`ps -ef | grep google | grep chrome | grep -v "grep" | wc -l`
+CHROME_STARTED=`ps -ef | grep google | grep chromium | grep -v "grep" | wc -l`
 if [ $CHROME_STARTED -gt 0 ]; then
 	exit 1;
 fi
@@ -23,10 +23,10 @@ else
 	echo "irxevent is not installed, can't do remote control"	
 fi
 
-/usr/bin/google-chrome "$@" &
+/usr/bin/chromium-browser "$@" &
 CHROME_PID=$!
 
-# wait for google-chrome to be killed before killing irxevent below. 
+# wait for chromium-browser to be killed before killing irxevent below. 
 wait $CHROME_PID
 
 if [ $IRXEVENT -eq 0 ]; then

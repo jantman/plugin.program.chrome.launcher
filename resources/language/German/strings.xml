@@ -3,11 +3,14 @@
   <string id="30001">Website hinzufügen</string>
   <string id="30002">Website entfernen</string>
   <string id="30003">Titel</string>
-  <string id="30005">Chrome nicht gefunden</string>
+  <string id="30004">URL</string>
+  <string id="30005">Chromium nicht gefunden</string>
   <string id="30006">Website Einstellungen ändern</string>
+  <string id="30007">Miniatur</string>
   <string id="30009">XBMC Wiedergabe stoppen?</string>
-  <string id="30010">Benutzerdefinierten Chrome/Skript Pfad nutzen</string>
-  <string id="30011">Chrome/Skript Pfad</string>
+  <string id="30010">Benutzerdefinierten Chromium/Skript Pfad nutzen</string>
+  <string id="30011">Chromium/Skript Pfad</string>
   <string id="30012">Eigenes Nutzerprofil nutzen (Kann beim ersten Start etwas dauern)</string>
+  <string id="30016">Benutzen kiosk modus?</string>
   <string id="30017">Debugprotokollierung</string>
 </strings>
