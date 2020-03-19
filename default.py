@@ -9,7 +9,7 @@ import subprocess
 import xbmcplugin
 import xbmcgui
 import xbmcaddon
-
+import xbmc
 
 addon = xbmcaddon.Addon()
 pluginhandle = int(sys.argv[1])
@@ -23,6 +23,8 @@ useOwnProfile = addon.getSetting("useOwnProfile") == "true"
 useCustomPath = addon.getSetting("useCustomPath") == "true"
 customPath = xbmc.translatePath(addon.getSetting("customPath"))
 debug = addon.getSetting("debug") == "true"
+LOGLEVEL = xbmc.LOGDEBUG
+LOGLEVEL = xbmc.LOGINFO
 
 userDataFolder = xbmc.translatePath("special://profile/addon_data/"+addonID)
 profileFolder = os.path.join(userDataFolder, 'profile')
@@ -115,6 +117,12 @@ def getFileName(title):
 
 
 def getFullPath(path, url, useKiosk, userAgent):
+    xbmc.log(
+        "getFullPath called with path=%s url=%s useKiosk=%s userAgent=%s" % (
+            path, url, useKiosk, userAgent
+        ),
+        level=LOGLEVEL
+    )
     profile = ""
     if useOwnProfile:
         profile = '--user-data-dir='+profileFolder
@@ -179,6 +187,7 @@ def getFullPath(path, url, useKiosk, userAgent):
         for arg in fullPath:
             strpath += " " + arg
         print strpath
+    xbmc.log("getFullPath returning: %s" % fullPath, level=LOGLEVEL)
     return fullPath
 
 
@@ -215,7 +224,9 @@ def showSite(url, stopPlayback, kiosk, userAgent):
 
     if chrome_path:
         fullUrl = getFullPath(chrome_path, url, kiosk, userAgent)
+        xbmc.log("showSite() calling popen with %s (creationflags=%s)" % (fullUrl, creationflags), level=LOGLEVEL)
         proc = subprocess.Popen(fullUrl, shell=False, creationflags=creationflags, close_fds = True)
+        xbmc.log("Chrome PID is %s" % proc.pid, level=LOGLEVEL)
         bringChromeToFront(proc.pid)
     else:
         xbmc.executebuiltin('XBMC.Notification(Info:,'+str(translation(30005))+'!,5000)')
@@ -232,24 +243,32 @@ def bringChromeToFront(pid):
                 current_window_id = subprocess.check_output(['xprop', '-root', '32x', '\'\t$0\'', '_NET_ACTIVE_WINDOW'])
                 current_window_id = current_window_id.strip("'").split()[1]
                 current_window_name = subprocess.check_output(['xprop', '-id', current_window_id, "WM_NAME"])
+                xbmc.log("current_window_id=%s current_window_name=%s" % (current_window_id, current_window_name), level=LOGLEVEL)
                 if "not found" not in current_window_name and "failed request" not in current_window_name:
                     current_window_name = current_window_name.strip().split(" = ")[1].strip('"')
                     name = current_window_name
-            except OSError:
+            except OSError as exc:
+                xbmc.log("currentActiveWindowLinux() got OSError: %s" % exc, level=LOGLEVEL)
                 pass
             return name
 
         def findWid():
             wid = None
+            xbmc.log("calling: xprop -root _NET_CLIENT_LIST", level=LOGLEVEL)
             match = re.compile("(0x[0-9A-Fa-f]+)").findall(subprocess.check_output(['xprop','-root','_NET_CLIENT_LIST']))
             if match:
                 for id in match:
+                    xbmc.log("found match: %s" % id, level=LOGLEVEL)
                     try:
                         wpid = subprocess.check_output(['xprop','-id',id,'_NET_WM_PID'])
                         wname = subprocess.check_output(['xprop','-id',id,'WM_NAME'])
+                        xbmc.log("wpid=%s wname=%s" % (wpid, wname), level=LOGLEVEL)
                         if str(pid) in wpid:
                             wid = id
-                    except (OSError, subprocess.CalledProcessError): pass
+                    except (OSError, subprocess.CalledProcessError) as exc:
+                        xbmc.log("CalledProcessError: %s" % exc, level=LOGLEVEL)
+            else:
+                xbmc.log("no match", level=LOGLEVEL)
             return wid
 
         try:
@@ -259,16 +278,22 @@ def bringChromeToFront(pid):
                 #if "Google Chrome" in windows:
                 wid = findWid()
                 if wid:
+                    xbmc.log("found wid: %s" % wid, level=LOGLEVEL)
                     try:
+                        xbmc.log("call: wmctrl -i -a %s" % wid, level=LOGLEVEL)
                         subprocess.Popen(['wmctrl', '-i', '-a', wid])
-                    except (OSError, subprocess.CalledProcessError):
+                    except (OSError, subprocess.CalledProcessError) as exc:
+                        xbmc.log("got exception: %s" % exc, level=LOGLEVEL)
                         try:
+                            xbmc.log("call: xdotool windowactivate %s" % wid, level=LOGLEVEL)
                             subprocess.Popen(['xdotool', 'windowactivate', wid])
                         except (OSError, subprocess.CalledProcessError):
-                            xbmc.log("Please install wmctrl or xdotool")
+                            xbmc.log("Please install wmctrl or xdotool", level=xbmc.LOGSEVERE)
                     break
+                else:
                 xbmc.sleep(500)
-        except (OSError, subprocess.CalledProcessError):
+        except (OSError, subprocess.CalledProcessError) as exc:
+            xbmc.log("got exception: %s" % exc, level=LOGLEVEL)
             pass
 
     elif osOsx:
