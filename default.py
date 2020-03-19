@@ -166,7 +166,7 @@ def getFullPath(path, url, useKiosk, userAgent):
         kiosk = '--kiosk'
     if userAgent:
         userAgent = '--user-agent="'+userAgent+'"'
-    
+
     #fullPath = '"'+path+'" '+profile+userAgent+'--start-maximized --disable-translate --disable-new-tab-first-run --no-default-browser-check --no-first-run '+kiosk+'"'+black_background+'"'
     fullPath = [path, profile, userAgent, '--start-fullscreen','--disable-translate','--disable-new-tab-first-run','--no-default-browser-check','--no-first-run', kiosk, black_background]
     for idx in range(0,len(fullPath))[::-1]:
@@ -205,10 +205,13 @@ def showSite(url, stopPlayback, kiosk, userAgent):
             chrome_path = path
     elif osLinux:
         path = "/usr/bin/google-chrome"
+        chromium_path = "/usr/bin/chromium-browser"
         if useCustomPath and os.path.exists(customPath):
             chrome_path = customPath
         elif os.path.exists(path):
             chrome_path = path
+        elif os.path.exists(chromium_path):
+            chrome_path = chromium_path
 
     if chrome_path:
         fullUrl = getFullPath(chrome_path, url, kiosk, userAgent)
