@@ -291,6 +291,7 @@ def bringChromeToFront(pid):
                             xbmc.log("Please install wmctrl or xdotool", level=xbmc.LOGSEVERE)
                     break
                 else:
+                    xbmc.log("no wid found.", level=LOGLEVEL)
                 xbmc.sleep(500)
         except (OSError, subprocess.CalledProcessError) as exc:
             xbmc.log("got exception: %s" % exc, level=LOGLEVEL)
